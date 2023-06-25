@@ -74,26 +74,28 @@ few = FastSchwarzschildEccentricFlux(
 )
 
 
+alpha = 1
 
 # parameters
 M = 1e6
-mu = 1e2
+mu = 1e3
 p0 = 12.0
 e0 = 0.4
 theta = np.pi/3  # polar viewing angle
 phi = np.pi/4  # azimuthal viewing angle
+dt = 10.0 * alpha
+
+wave = few(M, mu, p0, e0, theta, phi, dt=dt, T = alpha)  #  assumes dt = 10.0 for max T = 1.0 year
+
+
+
 dt = 10.0
+t = np.arange(len(wave)) * dt / (365 * 24 * 3600)
 
-wave = few(M, mu, p0, e0, theta, phi, dt=dt, T=1.0)  #  assumes dt = 10.0 for max T = 1.0 year
+fig, ax = plt.subplots(figsize = (18, 8))
 
+ax.plot(t, wave.real[:])
+ax.plot(t, wave.imag[:])
 
-
-
-dt = 10.0
-t = np.arange(len(wave)) * dt
-
-plt.plot(wave.real[:1000])
-plt.plot(wave.imag[:1000])
-
-
+plt.show()
 plt.savefig("test.png")
