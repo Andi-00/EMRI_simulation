@@ -1,6 +1,8 @@
 import sys
 import os
 
+from gwpy.timeseries import TimeSeries
+
 from matplotlib import pyplot as plt
 import numpy as np
 
@@ -27,6 +29,17 @@ from few.summation.directmodesum import DirectModeSum
 from few.utils.constants import *
 from few.summation.aakwave import AAKSummation
 from few.waveform import Pn5AAKWaveform, AAKWaveformBase
+
+plt.rcParams["axes.titlesize"] = 32
+plt.rcParams["axes.labelsize"] = 30
+plt.rcParams["axes.titleweight"] = "bold"
+plt.rcParams["xtick.labelsize"] = 22
+plt.rcParams["ytick.labelsize"] = 22
+plt.rcParams["legend.fontsize"] = 22
+plt.rcParams["axes.linewidth"] = 1.2
+plt.rcParams["scatter.marker"] = "."
+plt.rcParams["axes.grid"] = True
+
 
 use_gpu = False
 
@@ -77,25 +90,48 @@ few = FastSchwarzschildEccentricFlux(
 alpha = 1
 
 # parameters
-M = 1e6
-mu = 1e3
+M = 1e7
+mu = 1e4
 p0 = 12.0
 e0 = 0.4
 theta = np.pi/3  # polar viewing angle
 phi = np.pi/4  # azimuthal viewing angle
-dt = 10.0 * alpha
-
-wave = few(M, mu, p0, e0, theta, phi, dt=dt, T = alpha)  #  assumes dt = 10.0 for max T = 1.0 year
-
-
-
 dt = 10.0
-t = np.arange(len(wave)) * dt / (365 * 24 * 3600)
+dist = 1
 
-fig, ax = plt.subplots(figsize = (18, 8))
+wave = few(M, mu, p0, e0, theta, phi, dist = dist, dt=dt, T = 1)  #  assumes dt = 10.0 for max T = 1.0 year
 
-ax.plot(t, wave.real[:])
-ax.plot(t, wave.imag[:])
 
-plt.show()
+print(wave)
+print(wave.shape)
+print(len(wave.real))
+
+t = np.arange(len(wave.real)) * dt
+
+fig, ax = plt.subplots(figsize = (20, 9))
+
+ax.plot(t, wave.real[:], color = "royalblue")
+ax.plot(t, wave.imag[:], color = "crimson")
+
+ax.set_xlabel("Time [years]")
+ax.set_ylabel("Amplitude")
+ax.set_title("EMRI for a mass ratio of {:.1E}".format(M / mu), y = 1.02)
+
 plt.savefig("test.png")
+
+fig, ax = plt.subplots(figsize = (20, 9))
+
+data = TimeSeries(wave.real, dt = dt)
+specgram = data.spectrogram(10000, fftlength = 8000, overlap = 1000) ** (1 / 2)
+
+plot = specgram.imshow(norm = "log")
+ax = plot.gca()
+ax.set_yscale('log')
+ax.set_ylim(1E-4, 1E-2)
+ax.colorbar(
+    label=r'Gravitational-wave amplitude [strain/$\sqrt{\mathrm{Hz}}$]')
+
+
+plt.savefig("test_1.png")
+
+plot.show()
