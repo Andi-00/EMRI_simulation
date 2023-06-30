@@ -1,17 +1,14 @@
 import numpy as np
-from gwpy.timeseries import TimeSeries
-import matplotlib.pyplot as plt
+from matplotlib import pyplot as plt
+from matplotlib import cm
 
-dt = 0.01
+colormap = cm.get_cmap("jet")
 
-x = np.arange(0, 100, dt)
-y = np.sin(x) + x * np.sin(4 * x)
+x = np.arange(0, 10)
 
-data = TimeSeries(y, dt = dt)
-specgram = data.spectrogram(2, fftlength=1, overlap=.5) ** (1/2.)
+fig, ax = plt.subplots()
 
-plot = specgram.imshow(norm='log')
-ax = plot.gca()
-ax.set_yscale('log')
-ax.colorbar(label=r'Gravitational-wave amplitude [strain/$\sqrt{\mathrm{Hz}}$]')
-plot.show()
+for i in range(1, len(x)):
+    col = cm(i / len(x))
+
+    ax.plot(x[(i - 1) * len - i], x,)

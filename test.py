@@ -92,14 +92,17 @@ alpha = 1
 # parameters
 M = 1e7
 mu = 1e4
-p0 = 12.0
-e0 = 0.4
+p0 = 11.0
+e0 = 0.7
 theta = np.pi/3  # polar viewing angle
 phi = np.pi/4  # azimuthal viewing angle
-dt = 10.0
-dist = 1
 
-wave = few(M, mu, p0, e0, theta, phi, dist = dist, dt=dt, T = 1)  #  assumes dt = 10.0 for max T = 1.0 year
+theta, phi = 0, 0
+
+dt = 30.0
+# dist = 1
+
+wave = few(M, mu, p0, e0, theta, phi, dist = 1, dt=dt, T = 0.5)  #  assumes dt = 10.0 for max T = 1.0 year
 
 
 print(wave)
@@ -108,30 +111,60 @@ print(len(wave.real))
 
 t = np.arange(len(wave.real)) * dt
 
+
+gen_wave = GenerateEMRIWaveform("FastSchwarzschildEccentricFlux")
+
 fig, ax = plt.subplots(figsize = (20, 9))
 
-ax.plot(t, wave.real[:], color = "royalblue")
-ax.plot(t, wave.imag[:], color = "crimson")
+# ax.plot(t[-1000:], wave.real[-1000:], color = "royalblue")
+# ax.plot(t[-1000:], wave.imag[-1000:], color = "crimson")
 
-ax.set_xlabel("Time [years]")
-ax.set_ylabel("Amplitude")
-ax.set_title("EMRI for a mass ratio of {:.1E}".format(M / mu), y = 1.02)
+ax.plot(t, wave.real, color = "royalblue")
+
+ax.set_xlabel("Time $t$ [s]")
+ax.set_ylabel("Strain $h$")
+ax.set_title("EMRI for a mass ratio of {:.1E}".format(mu / M), y = 1.02)
 
 plt.savefig("test.png")
 
-fig, ax = plt.subplots(figsize = (20, 9))
 
-data = TimeSeries(wave.real, dt = dt)
-specgram = data.spectrogram(10000, fftlength = 8000, overlap = 1000) ** (1 / 2)
-
-plot = specgram.imshow(norm = "log")
-ax = plot.gca()
-ax.set_yscale('log')
-ax.set_ylim(1E-4, 1E-2)
-ax.colorbar(
-    label=r'Gravitational-wave amplitude [strain/$\sqrt{\mathrm{Hz}}$]')
+traj = EMRIInspiral(func="SchwarzEccFlux")
 
 
-plt.savefig("test_1.png")
 
-plot.show()
+# run trajectory
+# must include for generic inputs, will fix a = 0 and x = 1.0
+t, p, e, x, Phi_phi, Phi_theta, Phi_r = traj(M, mu, 0.0, p0, e0, 1.0, new_t=t, upsample=True, fix_t=True)
+
+r = p / (1 + e * np.cos(Phi_phi - Phi_theta))
+
+x = r * np.sin(Phi_theta) * np.cos(Phi_phi)
+y = r * np.sin(Phi_theta) * np.sin(Phi_phi)
+z = r * np.cos(Phi_theta)
+
+
+
+from matplotlib import cm
+
+fig, ax = plt.subplots(figsize = (20, 9), subplot_kw={"projection": "3d"})
+
+cmap = cm.get_cmap('plasma')
+
+m = 100
+
+for i in range(1, m):
+
+    color = cmap(i / m)
+
+    k = int(len(wave.real) / m)
+    a = x[k * (i - 1) : k * i + 1]
+    b = y[k * (i - 1) : k * i + 1]
+    c = z[k * (i - 1) : k * i + 1]
+
+    ax.plot(a, b, c, color = color)
+
+ax.scatter(0,0,0, s = 500, color = "black")
+
+fig.colorbar(cm.ScalarMappable(cmap=cmap), ax=ax)
+
+plt.show()
