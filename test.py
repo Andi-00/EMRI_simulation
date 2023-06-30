@@ -125,7 +125,7 @@ ax.set_xlabel("Time $t$ [s]")
 ax.set_ylabel("Strain $h$")
 ax.set_title("EMRI for a mass ratio of {:.1E}".format(mu / M), y = 1.02)
 
-plt.savefig("test.png")
+plt.savefig("EMRI_wave.png")
 
 
 traj = EMRIInspiral(func="SchwarzEccFlux")
@@ -136,19 +136,48 @@ traj = EMRIInspiral(func="SchwarzEccFlux")
 # must include for generic inputs, will fix a = 0 and x = 1.0
 t, p, e, x, Phi_phi, Phi_theta, Phi_r = traj(M, mu, 0.0, p0, e0, 1.0, new_t=t, upsample=True, fix_t=True)
 
-r = p / (1 + e * np.cos(Phi_phi - Phi_theta))
+r = p / (1 + e * np.cos(Phi_r))
+
+
+print(min(r))
+
+from matplotlib import cm
+cmap = cm.get_cmap('plasma')
+
+x = r * np.cos(Phi_phi)
+y = r * np.sin(Phi_phi)
+
+fig, ax = plt.subplots(figsize = (20, 9))
+
+m = 100
+x = r * np.cos(Phi_phi)
+y = r * np.sin(Phi_phi) 
+
+for i in range(1, m):
+
+    color = cmap(i / m)
+
+    k = int(len(wave.real) / m)
+    a = x[k * (i - 1) : k * i + 1]
+    b = y[k * (i - 1) : k * i + 1]
+
+    ax.plot(a, b, color = color)
+
+fig.colorbar(cm.ScalarMappable(cmap=cmap), ax=ax,  label = "time")
+
+ax.set_xlabel("Dimensionless x")
+ax.set_ylabel("Dimensionless y")
+ax.set_title("Trajectory of the second mass in the $x$-$y$-plane", y = 1.02)
+
+plt.savefig("2d_trajectory.png")
+
+fig, ax = plt.subplots(figsize = (18, 9), subplot_kw={"projection": "3d"})
+
 
 x = r * np.sin(Phi_theta) * np.cos(Phi_phi)
 y = r * np.sin(Phi_theta) * np.sin(Phi_phi)
 z = r * np.cos(Phi_theta)
 
-
-
-from matplotlib import cm
-
-fig, ax = plt.subplots(figsize = (20, 9), subplot_kw={"projection": "3d"})
-
-cmap = cm.get_cmap('plasma')
 
 m = 100
 
@@ -163,8 +192,15 @@ for i in range(1, m):
 
     ax.plot(a, b, c, color = color)
 
-ax.scatter(0,0,0, s = 500, color = "black")
+ax.scatter(0,1,0, s = 800, color = "black")
 
-fig.colorbar(cm.ScalarMappable(cmap=cmap), ax=ax)
+fig.colorbar(cm.ScalarMappable(cmap=cmap), ax=ax, label = "time")
+
+ax.set_xlabel("Dimensionless x", fontsize = 22, labelpad = 10)
+ax.set_ylabel("Dimensionless y", fontsize = 22, labelpad = 10)
+ax.set_zlabel("Dimensionless z", fontsize = 22, labelpad = 10)
+ax.set_title("Trajectory of the second mass", y = 1.02)
+
+plt.savefig("3d_trajectory.png")
 
 plt.show()
