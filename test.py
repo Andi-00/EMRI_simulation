@@ -91,19 +91,21 @@ alpha = 1
 
 # parameters
 M = 1e7
-mu = 1e4
+mu = 2e1
 p0 = 11.0
 e0 = 0.7
 theta = np.pi/3  # polar viewing angle
 phi = np.pi/4  # azimuthal viewing angle
+time = 0.2
 
 theta, phi = 0, 0
 
-dt = 30.0
+dt = 20.0
 # dist = 1
 
-wave = few(M, mu, p0, e0, theta, phi, dist = 1, dt=dt, T = 0.5)  #  assumes dt = 10.0 for max T = 1.0 year
+wave = few(M, mu, p0, e0, theta, phi, dist = 1, dt=dt, T = time)  #  assumes dt = 10.0 for max T = 1.0 year
 
+year = 365 * 24 * 3600
 
 print(wave)
 print(wave.shape)
@@ -119,9 +121,9 @@ fig, ax = plt.subplots(figsize = (20, 9))
 # ax.plot(t[-1000:], wave.real[-1000:], color = "royalblue")
 # ax.plot(t[-1000:], wave.imag[-1000:], color = "crimson")
 
-ax.plot(t, wave.real, color = "royalblue")
+ax.plot(t / year, wave.real, color = "royalblue")
 
-ax.set_xlabel("Time $t$ [s]")
+ax.set_xlabel("Time $t$ [year]")
 ax.set_ylabel("Strain $h$")
 ax.set_title("EMRI for a mass ratio of {:.1E}".format(mu / M), y = 1.02)
 
