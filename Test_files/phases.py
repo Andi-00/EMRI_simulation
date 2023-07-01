@@ -229,7 +229,7 @@ h = gen_wave(
     dt=dt,
 )
 
-T = dt * 10000 / (365 * 24 * 3600)
+T = dt * 40000 / (365 * 24 * 3600)
 
 M = 1e7  # solar mass
 mu = 1e2  # solar mass
