@@ -141,7 +141,7 @@ cbar = plt.colorbar(cm.ScalarMappable(cmap=cmap), ax=ax, label = "mass $M / M_\o
 cbar.ax.set_yticklabels(["$10^4$", "$10^5$", "$10^6$", "$10^7$"])
 
 ax.set_title("Mass comparison", y = 1.02)
-plt.savefig("Massen_vgl.png")
+# plt.savefig("Massen_vgl.png")
 
 
 # h0 = gen_wave(10 ** 4, mu, a, p0, e0, x0, dist, qS, phiS, qK, phiK, Phi_phi0, Phi_theta0, Phi_r0, T=T, dt=dt)
