@@ -131,7 +131,7 @@ for i in range(0, 4):
 
     t = np.arange(len(h.real)) * dt
 
-    ax.plot(t, h.real * 1E22 / 10 ** i, color = color, label = lab[i])
+    ax.plot(t, h.real * 1E22, color = color, label = lab[i])
 
 ax.legend()
 ax.set_xlabel("time $t /$s")
