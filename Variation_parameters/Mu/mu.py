@@ -122,6 +122,8 @@ cmap = cm.get_cmap('plasma')
 
 fig, ax = plt.subplots(figsize = (20, 9))
 
+lab = ["$\mu = 10^0 ~ M_\odot$", "$\mu = 10^1 ~ M_\odot$", "$\mu = 10^2 ~ M_\odot$", "$\mu = 10^3 ~ M_\odot$"]
+
 for i in range(0, 4):
     h = gen_wave(M, 10 ** i, a, p0, e0, x0, dist, qS, phiS, qK, phiK, Phi_phi0, Phi_theta0, Phi_r0, T=T, dt=dt)
 
@@ -129,7 +131,15 @@ for i in range(0, 4):
 
     t = np.arange(len(h.real)) * dt
 
-    ax.plot(t, h.real * 1E22 / 10 ** i, color = color)
+    ax.plot(t, h.real * 1E22 / 10 ** i, color = color, label = lab[i])
+
+ax.legend()
+ax.set_xlabel("time $t /$s")
+ax.set_ylabel("strain $h_+ / 10^{-22}$")
 
 ax.grid()
+ax.set_title(r"GW for different $\bf \mu$", y = 1.02)
+
+plt.savefig("Variation_parameters/Mu/mu_vgl.png")
+
 plt.show()

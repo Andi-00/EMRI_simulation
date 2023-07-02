@@ -88,10 +88,10 @@ few = FastSchwarzschildEccentricFlux(
 gen_wave = GenerateEMRIWaveform("Pn5AAKWaveform")
 
 # parameters
-T = 0.001  # years
-dt = 0.1  # seconds
+T = 3  # years
+dt = 20  # seconds
 
-# M = 1e7  # solar mass
+M = 1e7  # solar mass
 mu = 10  # solar mass
 
 dist = 1.0  # distance in Gpc
@@ -122,52 +122,24 @@ cmap = cm.get_cmap('plasma')
 
 fig, ax = plt.subplots(figsize = (20, 9))
 
+lab = ["$\mu = 10^0 ~ M_\odot$", "$\mu = 10^1 ~ M_\odot$", "$\mu = 10^2 ~ M_\odot$", "$\mu = 10^3 ~ M_\odot$"]
 
-for M in range(4, 8):
-    h = gen_wave(10 ** M, mu, a, p0, e0, x0, dist, qS, phiS, qK, phiK, Phi_phi0, Phi_theta0, Phi_r0, T=T, dt=dt)
+for i in range(0, 4):
+    h = gen_wave(M, 10 ** i, a, p0, e0, x0, dist, qS, phiS, qK, phiK, Phi_phi0, Phi_theta0, Phi_r0, T=T, dt=dt)
 
-    col = cmap((M - 4)/ 3)
+    color = cmap(1 - i / 3)
 
-    t = np.arange(len(h.real)) * dt
-    ax.plot(t, h.real * 1E22, color = col)
+    t = np.arange(len(h.real)) * dt / (365 * 24 * 3600)
 
-ax.set_xlabel("time $t /$s")
-ax.set_ylabel("strain $h_+ / 10^{-22}$")
+    ax.plot(t[-2000:], h.real[-2000:] * 1E22 / 10 ** i, color = color, label = lab[i])
+
+ax.legend()
+ax.set_xlabel("time $t /$a")
+ax.set_ylabel("strain $h_+ / \mu \cdot M_\odot / 10^{-22}$")
+
 ax.grid()
+ax.set_title(r"GW for different $\bf \mu$", y = 1.02)
 
-cbar = plt.colorbar(cm.ScalarMappable(cmap=cmap), ax=ax, label = "mass $M / M_\odot$", ticks = np.arange(0, 1.1, 1/3))
-cbar.ax.set_yticklabels(["$10^4$", "$10^5$", "$10^6$", "$10^7$"])
-
-ax.set_title("Mass comparison", y = 1.02)
-plt.savefig("Variation_parameters/Masse/Massen_vgl.png")
-
-
-# fig, ax = plt.subplots(2, 1, figsize = (18, 12))
-
-# h0 = gen_wave(10 ** 4, mu, a, p0, e0, x0, dist, qS, phiS, qK, phiK, Phi_phi0, Phi_theta0, Phi_r0, T=T, dt=dt)
-# h1 = gen_wave(10 ** 7, mu, a, p0, e0, x0, dist, qS, phiS, qK, phiK, Phi_phi0, Phi_theta0, Phi_r0, T=T, dt=dt)
-
-# t0 = np.arange(len(h0.real)) * dt
-# t1 = np.arange(len(h1.real)) * dt
-
-# ax[0].plot(t0[: 300], h0.real[: 300] * 1E22, color = cmap(0), label = "$M = 10^4 ~ M_\odot $")
-# ax[1].plot(t1[: 300000], h1.real[: 300000] * 1E22, color = cmap(1 / 3), label = "$M = 10^7 ~ M_\odot $")
-
-# ax[0].set_ylabel("strain $h_+ / 10^{-22}$")
-# ax[1].set_ylabel("strain $h_+ / 10^{-22}$")
-
-# ax[0].set_title("Timescales for different $M$", y = 1.02)
-# ax[1].set_xlabel("time $t$ / s")
-
-
-# ax[0].legend()
-# ax[1].legend()
-
-# ax[0].grid()
-# ax[1].grid()
-
-# plt.savefig("Variation_parameters/Masse/Massen_timescales.png")
-
-
+plt.savefig("Variation_parameters/Mu/large_times.png")
 
 plt.show()
