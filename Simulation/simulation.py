@@ -1,6 +1,8 @@
 import sys
 import os
 
+from gwpy.timeseries import TimeSeries
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -88,8 +90,8 @@ few = FastSchwarzschildEccentricFlux(
 gen_wave = GenerateEMRIWaveform("Pn5AAKWaveform")
 
 # parameters
-T = 0.02  # years
-dt = 9  # seconds
+T = 0.01  # years
+dt = 5  # seconds
 
 M = 1e7  # solar mass
 mu = 10  # solar mass
@@ -118,21 +120,23 @@ Phi_r0 = 0
 
 # Run time test
 
-import time
 
-st = time.time()
+h = gen_wave(M, mu, a, p0, e0, x0, dist, qS, phiS, qK, phiK, Phi_phi0, Phi_theta0, Phi_r0, T=T, dt=dt)
 
-for i in range(100):
+data = TimeSeries(h.real, dt = 5, name = "strain $h$")
 
-    M = 10 ** np.random.uniform(5, 7)
-    mu = 10 ** np.random.uniform(0, 1)
-    a = np.random.uniform(0, 1)
-    dist = np.random.uniform(1, 10)
+spec = data.spectrogram(500) ** (1 / 2)
 
-    h = gen_wave(M, mu, a, p0, e0, x0, dist, qS, phiS, qK, phiK, Phi_phi0, Phi_theta0, Phi_r0, T=T, dt=dt)
+print(spec)
 
-    np.savetxt("Simulation/test.csv", h, delimiter = ",")
+plot = spec.plot(norm = "log")
+ax = plot.gca()
+ax.set_ylim(1E-4, 1E-1)
+ax.set_yscale("log")
 
-et = time.time()
 
-print("Runtime = {:.4f}".format(et - st))
+
+
+plt.show()
+
+
