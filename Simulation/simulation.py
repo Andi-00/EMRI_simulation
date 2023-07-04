@@ -93,8 +93,8 @@ gen_wave = GenerateEMRIWaveform("Pn5AAKWaveform")
 T = 0.01  # years
 dt = 5  # seconds
 
-M = 1e7  # solar mass
-mu = 10  # solar mass
+M = 1e4  # solar mass
+mu = 1  # solar mass
 
 dist = 1.0  # distance in Gpc
 
@@ -118,21 +118,24 @@ Phi_theta0 = 0
 Phi_r0 = 0
 
 
-# Run time test
-
+from scipy import signal
+from scipy.fft import fftshift
 
 h = gen_wave(M, mu, a, p0, e0, x0, dist, qS, phiS, qK, phiK, Phi_phi0, Phi_theta0, Phi_r0, T=T, dt=dt)
 
-data = TimeSeries(h.real, dt = 5, name = "strain $h$")
 
-spec = data.spectrogram(500) ** (1 / 2)
+f, t, Sxx = signal.spectrogram(h.real, 0.2)
 
-print(spec)
+plt.pcolormesh(t, f, np.log(Sxx))
+plt.ylim(1E-4, 1E-1)
+plt.yscale("log")
+plt.ylabel('Frequency [Hz]')
 
-plot = spec.plot(norm = "log")
-ax = plot.gca()
-ax.set_ylim(1E-4, 1E-1)
-ax.set_yscale("log")
+plt.xlabel('Time [sec]')
+plt.colorbar()
+
+plt.show()
+
 
 
 

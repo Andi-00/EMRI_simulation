@@ -88,7 +88,7 @@ few = FastSchwarzschildEccentricFlux(
 gen_wave = GenerateEMRIWaveform("Pn5AAKWaveform")
 
 # parameters
-T = 0.001  # years
+T = 0.005  # years
 dt = 0.1  # seconds
 
 M = 1e7  # solar mass
