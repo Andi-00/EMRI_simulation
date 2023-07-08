@@ -121,20 +121,33 @@ Phi_r0 = 0
 from scipy import signal
 from scipy.fft import fftshift
 
+from gwpy import TimeSeries
+
 h = gen_wave(M, mu, a, p0, e0, x0, dist, qS, phiS, qK, phiK, Phi_phi0, Phi_theta0, Phi_r0, T=T, dt=dt)
 
+data = TimeSeries(h.real, dt = dt)
 
 f, t, Sxx = signal.spectrogram(h.real, 0.2)
 
-plt.pcolormesh(t, f, np.log(Sxx))
-plt.ylim(1E-4, 1E-1)
-plt.yscale("log")
-plt.ylabel('Frequency [Hz]')
 
-plt.xlabel('Time [sec]')
-plt.colorbar()
 
-plt.show()
+plot = specgram.plot(norm='log', vmin=1e-23, vmax=1e-19)
+ax = plot.gca()
+ax.set_ylim(40, 4000)
+ax.set_yscale('log')
+ax.colorbar(label='GW strain ASD [strain/$\sqrt{\mathrm{Hz}}$]')
+plot.show()
+
+
+# plt.pcolormesh(t, f, np.log(Sxx))
+# plt.ylim(1E-4, 1E-1)
+# plt.yscale("log")
+# plt.ylabel('Frequency [Hz]')
+
+# plt.xlabel('Time [sec]')
+# plt.colorbar()
+
+# plt.show()
 
 
 
