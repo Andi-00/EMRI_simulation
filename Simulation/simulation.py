@@ -30,15 +30,26 @@ from few.utils.constants import *
 from few.summation.aakwave import AAKSummation
 from few.waveform import Pn5AAKWaveform, AAKWaveformBase
 
-plt.rcParams["axes.titlesize"] = 32
-plt.rcParams["axes.labelsize"] = 30
-plt.rcParams["axes.titleweight"] = "bold"
-plt.rcParams["xtick.labelsize"] = 22
-plt.rcParams["ytick.labelsize"] = 22
-plt.rcParams["legend.fontsize"] = 22
-plt.rcParams["axes.linewidth"] = 1.2
-plt.rcParams["scatter.marker"] = "."
+plt.rcParams['pgf.rcfonts'] = False
+plt.rcParams['font.serif'] = []
+plt.rcParams['font.family'] = 'serif'
+plt.rcParams['text.usetex'] = True
+plt.rcParams['axes.formatter.useoffset'] = False
+plt.rcParams['lines.linewidth'] = 2
+plt.rcParams['errorbar.capsize'] = 2
+plt.rcParams['grid.linewidth'] = 0.5
+plt.rcParams['axes.labelsize'] = 20
+plt.rcParams['axes.titlesize'] =20
+plt.rcParams['xtick.labelsize'] = 14
+plt.rcParams['ytick.labelsize'] = 14
+plt.rcParams['legend.title_fontsize'] = 14
+plt.rcParams['legend.fontsize'] = 14
+plt.rcParams['savefig.dpi'] = 300
+plt.rcParams['savefig.bbox'] = 'tight'
+plt.rcParams['savefig.pad_inches'] = 0.1
 
+#plt.rcParams['savefig.transparent'] = True
+plt.rcParams['figure.figsize'] = (8, 6)
 
 use_gpu = False
 
@@ -118,11 +129,46 @@ Phi_theta0 = 0
 Phi_r0 = 0
 
 
-h = gen_wave(M, mu, a, p0, e0, x0, dist, qS, phiS, qK, phiK, Phi_phi0, Phi_theta0, Phi_r0, T=T, dt=dt)
+def gen_parameters(N):
+    n = np.random.uniform(4, 7, N)
+    M = 10 ** n
+    n = np.random.uniform(-2, 2, N)
+    md = 10 ** n
+    a = np.random.uniform(0, 1, N)
+    e0 = np.random.uniform(0, 0.7, N)
+    p0 = np.random.uniform(10, 16, N)
 
-data = TimeSeries(h.real, dt = dt)
+    return np.array([np.array([M[i], md[i], a[i], e0[i], p0[i]]) for i in range(N)])
 
 
-plt.show()
+def gen_strain(par):
+    M = par[:, 0]
+    mu = M * 1E-4
+    d = mu / par[:, 1]
+    a = par[:, 2]
+    e0 = par[:, 3]
+    p0 = par[:, 4]
+    h = np.array([gen_wave(M[i], mu[i], a[i], p0[i], e0[i], x0, d[i], qS, phiS, qK, phiK, Phi_phi0, Phi_theta0, Phi_r0, T=T, dt=dt) for i in range(len(d))])
+    
+    return h
+
+data = gen_parameters(3)
+h = gen_strain(data)
+
+print(len(h))
+
+print(data)
+
+# h = gen_wave(M, mu, a, p0, e0, x0, dist, qS, phiS, qK, phiK, Phi_phi0, Phi_theta0, Phi_r0, T=T, dt=dt)
+
+
+data1 = TimeSeries(h[0].real, dt = dt)
+data2 = TimeSeries(h[1].real, dt = dt)
+data3 = TimeSeries(h[2].real, dt = dt)
+
+from gwpy.plot import Plot
+
+plot = Plot(data1, data2, data3)
+plot.show()
 
 
