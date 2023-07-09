@@ -107,7 +107,7 @@ gen_wave = GenerateEMRIWaveform("Pn5AAKWaveform")
 T = 0.2  # years
 dt = 5  # seconds
 
-M = 10 ** 4.2  # solar mass
+M = 10 ** 5  # solar mass
 mu = 1 # solar mass
 
 dist = 1.0  # distance in Gpc
@@ -142,22 +142,24 @@ print(len(h.real))
 h = h.real
 
 data = TimeSeries(h / max(h), dt = dt)
+
+
  
 
 
 
-# specgram = data.spectrogram(len(h) * dt / 1000, nproc = 10) ** (1/2.)
-# print(specgram.shape)
+specgram = data.spectrogram(1E4, nproc = 10) ** (1/2.)
+print(specgram.shape)
 
-# plot = specgram.plot(norm='log', vmin=1E-3, vmax=1)
-# ax = plot.gca()
-# ax.grid(False)
-# ax.set_yscale('log')
-# ax.set_ylim(1E-4, 1E-1)
-# ax.colorbar(label='Relative amplitude')
+plot = specgram.plot(norm='log', vmin=2E-5, vmax=1)
+ax = plot.gca()
+ax.grid(False)
+ax.set_yscale('log')
+ax.set_ylim(1E-4, 1E-1)
+ax.colorbar(label='Relative amplitude')
 
-# plot.savefig("spectrogram.png")
-# plot.show()
+plot.savefig("new_spectrogram.png")
+plot.show()
 
 # print(specgram)
 
