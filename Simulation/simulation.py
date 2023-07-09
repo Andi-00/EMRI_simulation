@@ -128,7 +128,8 @@ Phi_phi0 = 0
 Phi_theta0 = 0
 Phi_r0 = 0
 
-
+# Generate the random parameters for the EMRIs
+# The parameters include M, mu / d, a, e0 and p0
 def gen_parameters(N):
     n = np.random.uniform(4, 7, N)
     M = 10 ** n
@@ -138,69 +139,102 @@ def gen_parameters(N):
     e0 = np.random.uniform(0, 0.7, N)
     p0 = np.random.uniform(10, 16, N)
 
-    return np.array([np.array([M[i], md[i], a[i], e0[i], p0[i]]) for i in range(N)])
+    parameters = np.array([np.array([M[i], md[i], a[i], e0[i], p0[i]]) for i in range(N)])
 
+    return parameters
 
+# Generate the strain h from the parameters par and returns it
 def gen_strain(par):
     M = par[:, 0]
-    mu = M * 1E-4
+    mu = M * 9E-5
     d = mu / par[:, 1]
     a = par[:, 2]
     e0 = par[:, 3]
     p0 = par[:, 4]
 
-    M = np.ones_like(M) * 1E7
-
-    h = np.array([gen_wave(M[i], mu[i], a[i], p0[i], e0[i], x0, d[i], qS, phiS, qK, phiK, Phi_phi0, Phi_theta0, Phi_r0, T=T, dt=dt) for i in range(len(d))])
+    h = np.array([gen_wave(M[i], mu[i], a[i], p0[i], e0[i], x0, d[i], qS, phiS, qK, phiK, Phi_phi0, Phi_theta0, Phi_r0, T=T, dt=dt) for i in range(len(d))], dtype = object)
     
     return h
 
+# Generate the spectrograms of the given strains
 def gen_specs(hs):
 
     specs = []
 
     for h in hs:
-
+        
+        # Fill the strain array with zeros, so that all have the same length
+        # independant of the signal duration
         hp = np.pad(h.real, (0, 1262326 - len(h)))
+        hp = h.real
 
         ts = TimeSeries(hp, dt = dt)
 
-        specs.append(ts.spectrogram(1E4, nproc = 10) ** (1/2.))
-
-    return np.array(specs)
+        data = ts.spectrogram(1E4, nproc = 10) ** (1/2.)
 
 
+        specs.append(data)
+
+    return specs
+
+# Save the spectrogram files as csv data
 def save_files(specs):
 
     for i in range(len(specs)):
-        np.savetxt("Simulation/data/data_{:06}.csv".format(i), specs[i], delimiter = ",")
+        np.savetxt("Simulation/data/data_{:06}.csv".format(i), np.array(specs[i]), delimiter = ",")
 
 
 
 
+# gernerate 5 data sets
+# data = gen_parameters(5)
+
+# Save the parameters in a csv file
+# np.savetxt("Simulation/params.csv", np.array(data), delimiter = ",")
+
+
+data = np.genfromtxt("Simulation/params.csv", delimiter= ",")
 
 
 
-data = gen_parameters(3)
+
 h = gen_strain(data)
 spec = gen_specs(h)
 save_files(spec)
 
 
-print(len(h))
 
-print(spec)
+
+for s in spec:
+    print(s.shape)
 
 # h = gen_wave(M, mu, a, p0, e0, x0, dist, qS, phiS, qK, phiK, Phi_phi0, Phi_theta0, Phi_r0, T=T, dt=dt)
 
 
-data1 = TimeSeries(h[0].real, dt = dt)
-data2 = TimeSeries(h[1].real, dt = dt)
-data3 = TimeSeries(h[2].real, dt = dt)
+# data2 = TimeSeries(h[1].real, dt = dt)
+# data3 = TimeSeries(h[2].real, dt = dt)
 
 from gwpy.plot import Plot
 
-plot = Plot(data1, data2, data3)
-plot.show()
+# plot = Plot(data1, data2, data3)
+# plot.show()
+
+# Strain values below a 0.01 percent of the maximum value are not taken into account
+
+for i in range(len(spec)):
+    plot = spec[i].imshow(norm='log', vmin = 1E-2 * np.max(np.array(spec[i])))
+    ax = plot.gca()
+    ax.set_yscale('log')
+    ax.set_ylim(1E-4, 1E-1)
+    ax.grid(False)
+    # ax.set_xlabel("Time $t$ [day]")
+    ax.set_ylabel("Frequency $f$ [Hz]")
+    ax.colorbar(
+        label=r'Gravitational-wave amplitude [strain/$\sqrt{\mathrm{Hz}}$]')
+    
+    ax.set_title("Spectrogram of the wave", y = 1.02)
+    plot.savefig("presentation/sensity_1E-2_{:02}.png".format(i))
+
+
 
 
