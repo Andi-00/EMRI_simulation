@@ -170,7 +170,7 @@ def gen_specs(hs):
 
         ts = TimeSeries(hp, dt = dt)
 
-        data = ts.spectrogram(1E4, nproc = 10) ** (1/2.)
+        data = ts.spectrogram(5E4, nproc = 14) ** (1/2.)
 
 
         specs.append(data)
@@ -196,44 +196,48 @@ def save_files(specs):
 data = np.genfromtxt("Simulation/params.csv", delimiter= ",")
 
 
+import time
 
+st = time.time()
 
 h = gen_strain(data)
 spec = gen_specs(h)
 save_files(spec)
 
+et = time.time()
+
+print(et - st)
 
 
+# for s in spec:
+#     print(s.shape)
 
-for s in spec:
-    print(s.shape)
-
-# h = gen_wave(M, mu, a, p0, e0, x0, dist, qS, phiS, qK, phiK, Phi_phi0, Phi_theta0, Phi_r0, T=T, dt=dt)
+# # h = gen_wave(M, mu, a, p0, e0, x0, dist, qS, phiS, qK, phiK, Phi_phi0, Phi_theta0, Phi_r0, T=T, dt=dt)
 
 
-# data2 = TimeSeries(h[1].real, dt = dt)
-# data3 = TimeSeries(h[2].real, dt = dt)
+# # data2 = TimeSeries(h[1].real, dt = dt)
+# # data3 = TimeSeries(h[2].real, dt = dt)
 
-from gwpy.plot import Plot
+# from gwpy.plot import Plot
 
-# plot = Plot(data1, data2, data3)
-# plot.show()
+# # plot = Plot(data1, data2, data3)
+# # plot.show()
 
-# Strain values below a 0.01 percent of the maximum value are not taken into account
+# # Strain values below a 0.01 percent of the maximum value are not taken into account
 
-for i in range(len(spec)):
-    plot = spec[i].imshow(norm='log', vmin = 1E-2 * np.max(np.array(spec[i])))
-    ax = plot.gca()
-    ax.set_yscale('log')
-    ax.set_ylim(1E-4, 1E-1)
-    ax.grid(False)
-    # ax.set_xlabel("Time $t$ [day]")
-    ax.set_ylabel("Frequency $f$ [Hz]")
-    ax.colorbar(
-        label=r'Gravitational-wave amplitude [strain/$\sqrt{\mathrm{Hz}}$]')
+# for i in range(len(spec)):
+#     plot = spec[i].imshow(norm='log', vmin = 2E-5 * np.max(np.array(spec[i])))
+#     ax = plot.gca()
+#     ax.set_yscale('log')
+#     ax.set_ylim(1E-4, 1E-1)
+#     ax.grid(False)
+#     # ax.set_xlabel("Time $t$ [day]")
+#     ax.set_ylabel("Frequency $f$ [Hz]")
+#     ax.colorbar(
+#         label=r'Gravitational-wave amplitude [strain/$\sqrt{\mathrm{Hz}}$]')
     
-    ax.set_title("Spectrogram of the wave", y = 1.02)
-    plot.savefig("presentation/sensity_1E-2_{:02}.png".format(i))
+#     ax.set_title("Spectrogram of the wave", y = 1.02)
+#     plot.savefig("presentation/deltaT_{:02}.png".format(i))
 
 
 
