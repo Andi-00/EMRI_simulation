@@ -148,7 +148,7 @@ data = TimeSeries(h / max(h), dt = dt)
 
 
 
-specgram = data.spectrogram(1E4, nproc = 10) ** (1/2.)
+specgram = data.spectrogram(2E4, nproc = 10) ** (1/2.)
 print(specgram.shape)
 
 plot = specgram.plot(norm='log', vmin=2E-5, vmax=1)
@@ -158,7 +158,7 @@ ax.set_yscale('log')
 ax.set_ylim(1E-4, 1E-1)
 ax.colorbar(label='Relative amplitude')
 
-plot.savefig("new_spectrogram.png")
+# plot.savefig("new_spectrogram.png")
 plot.show()
 
 # print(specgram)
