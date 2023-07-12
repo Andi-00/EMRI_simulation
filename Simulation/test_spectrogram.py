@@ -107,7 +107,7 @@ gen_wave = GenerateEMRIWaveform("Pn5AAKWaveform")
 T = 0.2  # years
 dt = 5  # seconds
 
-M = 10 ** 5  # solar mass
+M = 10 ** 6  # solar mass
 mu = 1 # solar mass
 
 dist = 1.0  # distance in Gpc

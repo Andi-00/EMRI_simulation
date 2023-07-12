@@ -2,9 +2,23 @@ import numpy as np
 from matplotlib import pyplot as plt
 from gwpy.spectrogram import Spectrogram
 
-data = np.genfromtxt("Simulation/params.csv", delimiter=",")
+data = np.swapaxes(np.genfromtxt("Simulation/data/data_000000.csv", delimiter=","), 0, 1)
 
-m = data[:, 0]
+print(data.shape)
 
-for mass in m:
-    print("{:.2e}".format(mass))
+x = np.arange(61) - 0.5
+y = np.arange(-1, 2001) * 5E-5 - 0.5 * 5E-5
+
+z = data
+
+
+fig, ax = plt.subplots()
+
+ax.pcolormesh(x, y, z, norm = "log", vmin = 2E-5 * np.max(z))
+ax.set_yscale("log")
+
+ax.set_ylim(1E-4, 1E-1 + 1E-4)
+
+
+
+plt.savefig("./test_grid.png")

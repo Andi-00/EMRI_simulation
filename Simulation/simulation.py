@@ -101,7 +101,7 @@ few = FastSchwarzschildEccentricFlux(
 gen_wave = GenerateEMRIWaveform("Pn5AAKWaveform")
 
 # parameters
-T = 0.05  # years
+T = 0.2  # years
 dt = 5  # seconds
 
 M = 1e4  # solar mass
@@ -170,7 +170,7 @@ def gen_specs(hs):
 
         ts = TimeSeries(hp, dt = dt)
 
-        data = ts.spectrogram(5E4, nproc = 14) ** (1/2.)
+        data = ts.spectrogram(2E4, nproc = 14) ** (1/2.)
 
 
         specs.append(data)
@@ -203,6 +203,8 @@ st = time.time()
 h = gen_strain(data)
 spec = gen_specs(h)
 save_files(spec)
+
+print(spec[0].shape)
 
 et = time.time()
 
