@@ -104,10 +104,10 @@ plt.rcParams['figure.figsize'] = (8, 6)
 gen_wave = GenerateEMRIWaveform("Pn5AAKWaveform")
 
 # parameters
-T = 0.2  # years
-dt = 5  # seconds
+T = 0.1  # years
+dt = 1  # seconds
 
-M = 10 ** 6  # solar mass
+M = 7 * 10 ** 4  # solar mass
 mu = 1 # solar mass
 
 dist = 1.0  # distance in Gpc
@@ -122,7 +122,7 @@ phiS = 0.0  # azimuthal viewing angle
 
 # spin related variables
 a = 0.6  # will be ignored in Schwarzschild waveform
-qK = 1E-6  # polar spin angle
+qK = np.pi / 2  # polar spin angle
 phiK = 0.0  # azimuthal viewing angle
 
 
@@ -141,38 +141,31 @@ print(len(h.real))
 
 h = h.real
 
+fig, ax = plt.subplots(figsize = (12, 6))
+ax.plot(np.arange(1000) * 5, h[:1000] * 1E22, color = "royalblue")
+ax.set_ylabel("Strain $h_+ / 10^{-22}$")
+ax.set_xlabel("Time $t$")
+ax.grid(True)
+
+plt.savefig("./Simulation/test_strain.png")
+
+
+
 data = TimeSeries(h / max(h), dt = dt)
 
 
- 
+specgram = data.spectrogram(1E4, nproc = 10) ** (1/2.)
 
 
-
-specgram = data.spectrogram(2E4, nproc = 10) ** (1/2.)
-print(specgram.shape)
-
-plot = specgram.plot(norm='log', vmin=2E-5, vmax=1)
+plot = specgram.plot(norm='log', vmin=5E-5, vmax=1)
 ax = plot.gca()
 ax.grid(False)
 ax.set_yscale('log')
 ax.set_ylim(1E-4, 1E-1)
+ax.set_xlabel("Time $t$ [weeks]")
+
 ax.colorbar(label='Relative amplitude')
 
-# plot.savefig("new_spectrogram.png")
-plot.show()
 
-# print(specgram)
+plot.savefig("./Simulation/test_spec.png")
 
-# qspecgram = data.q_transform(qrange=(16, 2048),frange = (1E-4, 1E-1), logf = True, fres = 100)
-
-# plot = qspecgram.plot(figsize=[8, 4])
-# ax = plot.gca()
-# ax.set_xscale('seconds')
-# ax.set_yscale('log')
-# ax.set_ylim(1E-4, 1E-1)
-# ax.set_ylabel('Frequency [Hz]')
-# ax.grid(True, axis='y', which='both')
-# ax.colorbar(cmap='viridis', label='Normalized energy')
-
-
-# plot.savefig("q_transfrom.png")
