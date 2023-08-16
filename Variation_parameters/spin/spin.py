@@ -1,5 +1,6 @@
 import sys
 import os
+from gwpy.timeseries import TimeSeries
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -28,14 +29,26 @@ from few.utils.constants import *
 from few.summation.aakwave import AAKSummation
 from few.waveform import Pn5AAKWaveform, AAKWaveformBase
 
-plt.rcParams["axes.titlesize"] = 32
-plt.rcParams["axes.labelsize"] = 30
-plt.rcParams["axes.titleweight"] = "bold"
-plt.rcParams["xtick.labelsize"] = 22
-plt.rcParams["ytick.labelsize"] = 22
-plt.rcParams["legend.fontsize"] = 22
-plt.rcParams["axes.linewidth"] = 1.2
-plt.rcParams["scatter.marker"] = "."
+plt.rcParams['pgf.rcfonts'] = False
+plt.rcParams['font.serif'] = []
+plt.rcParams['font.family'] = 'serif'
+plt.rcParams['text.usetex'] = True
+plt.rcParams['axes.formatter.useoffset'] = False
+plt.rcParams['lines.linewidth'] = 2
+plt.rcParams['errorbar.capsize'] = 2
+plt.rcParams['grid.linewidth'] = 0.5
+plt.rcParams['axes.labelsize'] = 18
+plt.rcParams['axes.titlesize'] = 18
+plt.rcParams['xtick.labelsize'] = 14
+plt.rcParams['ytick.labelsize'] = 14
+plt.rcParams['legend.title_fontsize'] = 14
+plt.rcParams['legend.fontsize'] = 14
+plt.rcParams['savefig.dpi'] = 300
+plt.rcParams['savefig.bbox'] = 'tight'
+plt.rcParams['savefig.pad_inches'] = 0.1
+
+#plt.rcParams['savefig.transparent'] = True
+plt.rcParams['figure.figsize'] = (10, 6)
 
 
 use_gpu = False
@@ -88,25 +101,25 @@ few = FastSchwarzschildEccentricFlux(
 gen_wave = GenerateEMRIWaveform("Pn5AAKWaveform")
 
 # parameters
-T = 0.002  # years
-dt = 0.1  # seconds
+T = 0.05 # years
+dt = 5  # seconds
 
-M = 1e7  # solar mass
-mu = 10  # solar mass
+M = 4e4  # solar mass
+mu = 1  # solar mass
 
 dist = 1.0  # distance in Gpc
 
 p0 = 12.0
 e0 = 0.2
-x0 = 1.0  # will be ignored in Schwarzschild waveform
+x0 = 0.99  # will be ignored in Schwarzschild waveform
 
-qS = 0.0  # polar sky angle
+qS = 1E-6  # polar sky angle
 phiS = 0.0  # azimuthal viewing angle
 
 
 # spin related variables
 a = 0.6  # will be ignored in Schwarzschild waveform
-qK = 0  # polar spin angle
+qK = 1E-6  # polar spin angle
 phiK = 0.0  # azimuthal viewing angle
 
 
@@ -120,26 +133,56 @@ from matplotlib import cm
 cmap = cm.get_cmap('plasma')
 
 
-fig, ax = plt.subplots(figsize = (20, 9))
+# fig, ax = plt.subplots(figsize = (20, 9))
 
 lab = ["$a = 0.2$", "$a = 0.4$", "$a = 0.6$", "$a = 0.8$"]
 
-for i in range(0, 4):
-    h = gen_wave(M, mu, (1 + i) / 5, p0, e0, x0, dist, qS, phiS, qK, phiK, Phi_phi0, Phi_theta0, Phi_r0, T=T, dt=dt)
 
+from gwpy.plot import Plot
+
+
+for i in range(0, 4):
+
+    print(i)
+    
+    h = gen_wave(M, mu, (1 + i) / 50, p0, e0, x0, dist, qS, phiS, qK, phiK, Phi_phi0, Phi_theta0, Phi_r0, T=T, dt=dt)
+    
     color = cmap(i / 4)
 
     t = np.arange(len(h.real)) * dt
 
-    ax.plot(t, h.real * 1E22, color = color, label = lab[i])
+    # ax.plot(t, h.real * 1E22, color = color, label = lab[i])
 
-ax.legend(loc = "upper right")
-ax.set_xlabel("time $t /$s")
-ax.set_ylabel("strain $h_+ / 10^{-22}$")
 
-ax.grid()
-ax.set_title(r"GW for different $\bf a$", y = 1.02)
+    ts = TimeSeries(h.real, dt = dt)
 
-plt.savefig("Variation_parameters/spin/spin_vgl.png")
+    data = ts.spectrogram(2E4) ** (1/2)
 
-plt.show()
+    plot = data.imshow(norm='log', vmin = 2E-5 * np.max(np.array(data)))
+    ax = plot.gca()
+    ax.set_yscale('log')
+    ax.set_ylim(1E-4, 1E-1)
+    ax.grid(False)
+    # ax.set_xlabel("Time $t$ [day]")
+    ax.set_ylabel("Frequency $f$ [Hz]")
+    ax.colorbar(label=r'Gravitational-wave amplitude [strain/$\sqrt{\mathrm{Hz}}$]')
+        
+    ax.set_title(r"Spectrogram of the wave with $a$" + " = {:.1f}".format((i + 1) / 50), y = 1.02)
+
+    # plt.show()
+    plt.savefig("./Variation_parameters/spin/spec_{:.2f}.png".format((1 + i) / 50))
+    
+
+    
+
+
+# ax.legend(loc = "upper right")
+# ax.set_xlabel("time $t /$s")
+# ax.set_ylabel("strain $h_+ / 10^{-22}$")
+
+# ax.grid()
+# ax.set_title(r"GW for different $\bf a$", y = 1.02)
+
+# plt.savefig("Variation_parameters/spin/spin_vgl.png")
+
+# plt.show()
