@@ -143,9 +143,9 @@ from gwpy.plot import Plot
 
 for i in range(0, 4):
 
-    print(i)
+    print(i + 1)
     
-    h = gen_wave(M, mu, (1 + i) / 50, p0, e0, x0, dist, qS, phiS, qK, phiK, Phi_phi0, Phi_theta0, Phi_r0, T=T, dt=dt)
+    h = gen_wave(M, mu, (1 + i) / 5, p0, e0, x0, dist, qS, phiS, qK, phiK, Phi_phi0, Phi_theta0, Phi_r0, T=T, dt=dt)
     
     color = cmap(i / 4)
 
@@ -167,10 +167,10 @@ for i in range(0, 4):
     ax.set_ylabel("Frequency $f$ [Hz]")
     ax.colorbar(label=r'Gravitational-wave amplitude [strain/$\sqrt{\mathrm{Hz}}$]')
         
-    ax.set_title(r"Spectrogram of the wave with $a$" + " = {:.2f}".format((i + 1) / 50), y = 1.02)
+    ax.set_title(r"Spectrogram of the wave with $a$" + " = {:.1f}".format((i + 1) / 5), y = 1.02)
 
     # plt.show()
-    plt.savefig("./Variation_parameters/spin/spec_{:.2f}.png".format((1 + i) / 50))
+    plt.savefig("./Variation_parameters/spin/spec_{:.1f}.png".format((1 + i) / 5))
     
 
     
