@@ -13,7 +13,7 @@ print(data0.shape, data1.shape, data2.shape, data3.shape, data4.shape)
 x = np.arange(61) - 0.5
 y = np.arange(-1, 2001) * 5E-5 - 0.5 * 5E-5
 
-z = data
+z = 1
 
 
 fig, ax = plt.subplots()
