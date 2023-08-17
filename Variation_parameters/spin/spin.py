@@ -104,7 +104,7 @@ gen_wave = GenerateEMRIWaveform("Pn5AAKWaveform")
 T = 0.05 # years
 dt = 5  # seconds
 
-M = 4e4  # solar mass
+M = 3e5  # solar mass
 mu = 1  # solar mass
 
 dist = 1.0  # distance in Gpc
@@ -145,7 +145,7 @@ for i in range(0, 4):
 
     print(i + 1)
     
-    h = gen_wave(M, mu, (1 + i) / 5, p0, e0, x0, dist, qS, phiS, qK, phiK, Phi_phi0, Phi_theta0, Phi_r0, T=T, dt=dt)
+    h = gen_wave(M, mu, (1 + i) / 10, p0, e0, x0, dist, qS, phiS, qK, phiK, Phi_phi0, Phi_theta0, Phi_r0, T=T, dt=dt)
     
     color = cmap(i / 4)
 
@@ -167,10 +167,10 @@ for i in range(0, 4):
     ax.set_ylabel("Frequency $f$ [Hz]")
     ax.colorbar(label=r'Gravitational-wave amplitude [strain/$\sqrt{\mathrm{Hz}}$]')
         
-    ax.set_title(r"Spectrogram of the wave with $a$" + " = {:.1f}".format((i + 1) / 5), y = 1.02)
+    ax.set_title(r"Spectrogram of the wave with $a$" + " = {:.1f}".format((i + 1) / 10), y = 1.02)
 
     # plt.show()
-    plt.savefig("./Variation_parameters/spin/spec_{:.1f}.png".format((1 + i) / 5))
+    plt.savefig("./Variation_parameters/spin/spec1_{:.1f}.png".format((1 + i) / 10))
     
 
     
